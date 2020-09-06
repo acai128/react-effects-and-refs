@@ -1,48 +1,59 @@
 import React, { useState, useEffect } from "react"; 
 import axios from "axios";
 
-const base_URL = "https://deckofcardsapi.com/api/deck/"; 
 
 function Deck(){
-    const [card, setCard] = useState({}); 
+    const [card, setCard] = useState(null); 
     const [deck_id, setDeck_id] = useState({}); 
+    const url = "https://deckofcardsapi.com/api/deck/"; 
 
-    const handleClick = evt => {
-        console.log(evt.target.value); 
-       setDeck_id(evt.target.value);
+    useEffect(function(){
+        async function deckUser(){
+            console.log('running useEffect******')
+            const deckResult = await axios.get("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1"); 
+            setDeck_id(deckResult.data.deck_id); 
+        }
+        deckUser()
+    }, []); 
+            
+    const handleClick = () => {
+        async function drawCard() {
+            console.log('deckId...', deckId)
+            const card = await axios.get("https://deckofcardsapi.com/api/deck/${deckId}/draw/");
+            setCard(card.data); 
+            console.log('card.data...', card.data); 
+        }
+        drawCard()
+
     }
 
-    // useEffect(function(){
-    //     async function fetchUser() {
-    //         const cardResult = await axios.get(
-    //             `${base_URL}`);  
-    //             setCard(cardResult.data); 
-    //             console.log(cardResult.data); 
-    
+    function getCard(){
+        if(card.remaining === 0){
+            return alert("No more cards!"); 
+        } 
+        console.log('this is the current card...', card)
+        const cardD = card.cards[0]; 
+        console.log('cardD...', cardD.image)
+        return <img src={cardD.image} />
+    }
             
-    useEffect(function(){
-        async function getCard(){
-            try{
-            const deck_id = setCard.deck_id;
-            const card_URL = `${base_URL}/${deck_id}/draw/`;
-             
-            const cardResponse = await axios.get(
-                "https://deckofcardsapi.com/api/deck/h2sutgo0slv1/draw/"); 
-                setCard(cardResponse.data); 
-                console.log(cardResponse.data); 
-                if(cardResponse.remaining === 0) { throw new Error("No card remaining!")}; 
-            const card = cardResponse.data.cards[0]; 
+        //     const cardResponse = await axios.get(
+        //         "https://deckofcardsapi.com/api/deck/h2sutgo0slv1/draw/"); 
+        //         setCard(cardResponse.data); 
+        //         console.log(cardResponse.data); 
+        //         if(cardResponse.remaining === 0) { throw new Error("No card remaining!")}; 
+        //     const card = cardResponse.data.cards[0]; 
             
                 
-            }   
-            catch(err) {
-                alert(err)
-            }
+        //     }   
+        //     catch(err) {
+        //         alert(err)
+        //     }
             
           
-        }
-            getCard(); 
-        }, [setCard])
+        // }
+        //     getCard(); 
+        // }, [setCard])
 
 
     
@@ -50,6 +61,7 @@ function Deck(){
         <div>
             <h1>Card</h1>
             <button onClick={handleClick}>New Card</button>
+            <div>{card && getCard()}</div>
         </div>
     )
 }
