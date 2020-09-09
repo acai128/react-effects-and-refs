@@ -4,8 +4,9 @@ import axios from "axios";
 
 function Deck(){
     const [card, setCard] = useState(null); 
-    const [deck_id, setDeck_id] = useState({}); 
+    const [deckId, setDeck_id] = useState(''); 
     const url = "https://deckofcardsapi.com/api/deck/"; 
+    const [count, setcount] = useState(''); 
 
     useEffect(function(){
         async function deckUser(){
@@ -17,11 +18,15 @@ function Deck(){
     }, []); 
             
     const handleClick = () => {
+        if(setCount === 21){
+            return ("You win!")
+        }
         async function drawCard() {
             console.log('deckId...', deckId)
-            const card = await axios.get("https://deckofcardsapi.com/api/deck/${deckId}/draw/");
+            const card = await axios.get(`https://deckofcardsapi.com/api/deck/${deckId}/draw/`);
             setCard(card.data); 
-            console.log('card.data...', card.data); 
+            console.log('card.data...', card.data)
+            
         }
         drawCard()
 
@@ -33,9 +38,21 @@ function Deck(){
         } 
         console.log('this is the current card...', card)
         const cardD = card.cards[0]; 
+        setCount(cardD.value); 
         console.log('cardD...', cardD.image)
-        return <img src={cardD.image} />
+        console.log(cardD.value)
+        return (
+            <div>
+                <img src={cardD.image} />
+                <p>Count: {cardD.value}</p>
+            </div>
+            )
     }
+
+    // function cardCount(){
+    //     let cardNums = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+    //     cardTotal = 
+    // }
             
         //     const cardResponse = await axios.get(
         //         "https://deckofcardsapi.com/api/deck/h2sutgo0slv1/draw/"); 
@@ -60,8 +77,9 @@ function Deck(){
     return (
         <div>
             <h1>Card</h1>
-            <button onClick={handleClick}>New Card</button>
             <div>{card && getCard()}</div>
+            <button onClick={handleClick}>New Card</button>
+
         </div>
     )
 }
